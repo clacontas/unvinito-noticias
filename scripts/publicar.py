@@ -2,6 +2,7 @@ import os
 import feedparser
 import tweepy
 import requests
+import json
 from groq import Groq
 from datetime import datetime
 
@@ -40,7 +41,7 @@ def obtener_noticias():
     return noticias[:5]
 
 def generar_contenido(noticias):
-    titulares = "\n".join([f"- {n['titulo']} ({n['fuente']})" for n in noticias])
+    titulares = "\n".join([f"- {n['titulo']} ({n['fuente']}) | {n['link']}" for n in noticias])
     
     prompt = f"""Eres el community manager de UNVINITO, una marca de vino chileno de autor del Valle de Colchagua. 
 Produces dos variedades: Cabernet Sauvignon y Carménère.
@@ -49,65 +50,25 @@ Tu tono es cercano, apasionado por el vino, con personalidad y algo de humor. Nu
 Basándote en estos titulares de noticias de hoy:
 {titulares}
 
-Genera:
-1. Un TWEET de máximo 250 caracteres con la noticia más interesante. 
-   Incluye 1-2 emojis relevantes y 2-3 hashtags como #VinoChileno #Colchagua #UNVINITO
-   IMPORTANTE: Solo usa el titular, nunca inventes contenido del artículo.
+Genera contenido para cada noticia. Usa SOLO el titular, nunca inventes contenido.
 
-2. Un MENSAJE para canal de Telegram más detallado (máximo 300 caracteres).
-   Puedes agregar una reflexión breve desde la perspectiva de UNVINITO.
-
-Responde SOLO en este formato JSON:
+Responde SOLO en este formato JSON sin texto adicional:
 {{
-  "tweet": "texto del tweet aquí",
-  "telegram": "texto de telegram aquí",
-  "fuente_url": "url de la noticia usada"
+  "noticias": [
+    {{
+      "titulo": "titular original de la noticia",
+      "tweet": "texto del tweet máximo 250 caracteres con 1-2 emojis y hashtags #VinoChileno #UNVINITO",
+      "telegram": "mensaje para telegram con reflexión de UNVINITO máximo 300 caracteres",
+      "fuente": "nombre del medio",
+      "url": "url de la noticia"
+    }}
+  ],
+  "destacada": 0
 }}"""
 
     respuesta = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.7,
-        max_tokens=500
+        max_tokens=1000
     )
-    
-    import json
-    texto = respuesta.choices[0].message.content
-    return json.loads(texto)
-
-def publicar_en_x(tweet):
-    try:
-        x_client.create_tweet(text=tweet)
-        print(f"✅ Tweet publicado: {tweet[:50]}...")
-    except Exception as e:
-        print(f"❌ Error en X: {e}")
-
-def publicar_en_telegram(mensaje):
-    try:
-        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-        requests.post(url, json={
-            "chat_id": TELEGRAM_CHANNEL,
-            "text": mensaje,
-            "parse_mode": "HTML"
-        })
-        print(f"✅ Telegram publicado")
-    except Exception as e:
-        print(f"❌ Error en Telegram: {e}")
-
-def main():
-    print(f"🍷 UNVINITO Noticias - {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    
-    noticias = obtener_noticias()
-    if not noticias:
-        print("No se encontraron noticias hoy")
-        return
-    
-    contenido = generar_contenido(noticias)
-    
-    publicar_en_x(contenido["tweet"])
-    publicar_en_telegram(contenido["telegram"])
-    
-    print("✅ Proceso completado")
-
-if __name__ == "__main__":
-    main()
