@@ -1,4 +1,5 @@
 import os
+import re
 import feedparser
 import tweepy
 import requests
@@ -41,30 +42,54 @@ def obtener_noticias():
     return noticias[:5]
 
 def generar_contenido(noticias):
-    titulares = "\n".join([f"- {n['titulo']} ({n['fuente']}) | {n['link']}" for n in noticias])
-    
-    prompt = f"""Eres el community manager de UNVINITO, una marca de vino chileno de autor del Valle de Colchagua. 
-Produces dos variedades: Cabernet Sauvignon y Carmenere.
-Tu tono es cercano, apasionado por el vino, con personalidad y algo de humor. Nunca eres pretencioso.
+    titulares = "\n".join([f"- {n['titulo']} ({n['fuente']})" for n in noticias])
+    links = {n['titulo']: n['link'] for n in noticias}
 
-Basandote en estos titulares de noticias de hoy:
+    prompt = f"""Eres el community manager de UNVINITO, marca de vino chileno del Valle de Colchagua.
+Produces Cabernet Sauvignon y Carmenere.
+Tono cercano, apasionado, con humor. Nunca pretencioso.
+
+Noticias de hoy:
 {titulares}
 
-Genera contenido para cada noticia. Usa SOLO el titular, nunca inventes contenido.
+Crea contenido para la noticia MAS interesante. Usa SOLO el titular, no inventes.
 
-Responde SOLO en este formato JSON sin texto adicional ni backticks:
-{{"noticias": [{{"titulo": "titular original", "tweet": "texto tweet max 250 chars con emojis y hashtags #VinoChileno #UNVINITO", "telegram": "mensaje telegram max 300 chars con reflexion UNVINITO", "fuente": "nombre medio", "url": "url noticia"}}], "destacada": 0}}"""
+Responde UNICAMENTE con este JSON, sin explicaciones ni backticks:
+{{"titulo": "titular exacto", "tweet": "tweet max 240 chars con emojis #VinoChileno #UNVINITO", "telegram": "mensaje max 280 chars con reflexion UNVINITO", "fuente": "nombre medio", "destacada": 0}}"""
 
     respuesta = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.7,
-        max_tokens=1000
+        max_tokens=500
     )
+
+    texto = respuesta.choices[0].message.content.strip()
+    print(f"Respuesta Groq: {texto[:200]}")
     
-    texto = respuesta.choices[0].message.content
     texto = texto.replace("```json", "").replace("```", "").strip()
-    return json.loads(texto)
+    
+    try:
+        data = json.loads(texto)
+    except json.JSONDecodeError:
+        match = re.search(r'\{[^{}]*\}', texto, re.DOTALL)
+        if match:
+            data = json.loads(match.group())
+        else:
+            raise
+
+    url = links.get(data.get("titulo", ""), noticias[0]["link"])
+    
+    return {
+        "noticias": [{
+            "titulo": data.get("titulo", noticias[0]["titulo"]),
+            "tweet": data.get("tweet", ""),
+            "telegram": data.get("telegram", ""),
+            "fuente": data.get("fuente", ""),
+            "url": url
+        }],
+        "destacada": 0
+    }
 
 def guardar_para_web(contenido):
     hoy = datetime.now().strftime("%Y-%m-%d")
@@ -102,6 +127,7 @@ def publicar_en_telegram(mensaje, url):
             "text": texto
         })
         print(f"✅ Telegram publicado: {r.status_code}")
+        print(f"Respuesta Telegram: {r.text[:100]}")
     except Exception as e:
         print(f"❌ Error en Telegram: {e}")
 
@@ -116,7 +142,7 @@ def main():
         contenido = generar_contenido(noticias)
         print(f"✅ Contenido generado")
         guardar_para_web(contenido)
-        destacada = contenido["noticias"][contenido.get("destacada", 0)]
+        destacada = contenido["noticias"][0]
         print(f"📤 Publicando: {destacada['titulo'][:50]}...")
         publicar_en_x(destacada["tweet"])
         publicar_en_telegram(destacada["telegram"], destacada["url"])
