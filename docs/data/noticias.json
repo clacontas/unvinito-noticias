@@ -1,0 +1,13 @@
+{
+  "fecha": "2026-06-20",
+  "fecha_legible": "Saturday, 20 de June de 2026",
+  "noticias": [
+    {
+      "titulo": "Reportaje | ¿Qué hay detrás del precio de un gran vino en Chile?",
+      "descripcion": "¿Alguna vez te has preguntado qué hace que un vino sea tan caro? Reflexiona con nosotros sobre el valor detrás de un gran vino UNVINITO",
+      "fuente": "Portal Agro Chile",
+      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPdkMySE5Gb3NUNE1WU2l2NXVJd3NGTU5TWnNWak1DQ3RWYmpjQnVUUUMtaGJjcFBFZ3E5cldhSTAtVjZXb3A1Zk56bHVuOTZTQ0NBZkdTcl9fNFphSVdsZFJramVxdmpzalJ2TzcxMUh0U2J1U2ZCSmZTdGZPZG9jSi1pdEYtZWZHdDdiV05zTmNjN3I0TzVxTG5YN1daWGdRZXJEc21B?oc=5",
+      "destacada": true
+    }
+  ]
+}
