@@ -29,14 +29,34 @@
             margin-bottom: 20px;
             border-left: 4px solid #c0392b;
         }
+        .noticia.destacada {
+            border-left: 4px solid #d4a574;
+            background: #3d1a00;
+        }
+        .badge {
+            background: #d4a574;
+            color: #1a0a00;
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
         .noticia h2 { color: #d4a574; font-size: 1.1em; margin-bottom: 10px; }
         .noticia p { color: #f5e6d3; line-height: 1.6; }
         .noticia .meta { 
             color: #8b6914; 
             font-size: 0.85em; 
-            margin-top: 10px; 
+            margin-top: 12px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
-        .noticia a { color: #c0392b; }
+        .noticia a { 
+            color: #c0392b; 
+            text-decoration: none;
+        }
+        .noticia a:hover { text-decoration: underline; }
         footer {
             text-align: center;
             padding: 20px;
@@ -45,7 +65,9 @@
             border-top: 1px solid #6b1a1a;
             margin-top: 40px;
         }
+        footer a { color: #c0392b; }
         #fecha { color: #d4a574; font-weight: bold; }
+        .cargando { text-align:center; color:#d4a574; padding:40px; }
     </style>
 </head>
 <body>
@@ -56,16 +78,14 @@
     </header>
     
     <div class="container" id="contenido">
-        <p style="text-align:center; color:#d4a574; padding:40px">
-            Cargando noticias... 🍷
-        </p>
+        <p class="cargando">Cargando noticias... 🍷</p>
     </div>
 
     <footer>
         Generado automáticamente · UNVINITO · Valle de Colchagua, Chile<br>
         Síguenos en 
-        <a href="https://twitter.com/unvinitowine" style="color:#c0392b">@unvinitowine</a> · 
-        <a href="https://t.me/unvinito_noticias" style="color:#c0392b">Telegram</a>
+        <a href="https://twitter.com/unvinitowine">@unvinitowine</a> · 
+        <a href="https://t.me/unvinito_noticias">Telegram</a>
     </footer>
 
     <script>
@@ -73,6 +93,32 @@
             new Date().toLocaleDateString('es-CL', {
                 weekday: 'long', year: 'numeric', 
                 month: 'long', day: 'numeric'
+            });
+
+        fetch('data/noticias.json')
+            .then(r => r.json())
+            .then(data => {
+                const contenido = document.getElementById('contenido');
+                contenido.innerHTML = '';
+                
+                data.noticias.forEach(n => {
+                    const div = document.createElement('div');
+                    div.className = 'noticia' + (n.destacada ? ' destacada' : '');
+                    div.innerHTML = `
+                        ${n.destacada ? '<span class="badge">⭐ Destacada</span>' : ''}
+                        <h2>${n.titulo}</h2>
+                        <p>${n.descripcion}</p>
+                        <div class="meta">
+                            📰 ${n.fuente}
+                            <a href="${n.url}" target="_blank">Leer más →</a>
+                        </div>
+                    `;
+                    contenido.appendChild(div);
+                });
+            })
+            .catch(() => {
+                document.getElementById('contenido').innerHTML = 
+                    '<p class="cargando">Las noticias se actualizan cada mañana a las 8 AM 🍷</p>';
             });
     </script>
 </body>
