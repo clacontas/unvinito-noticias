@@ -22,7 +22,7 @@ x_client = tweepy.Client(
 # Telegram
 TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
 TELEGRAM_CHANNEL = os.environ["TELEGRAM_CHANNEL"]
-SITIO_WEB = "https://clacontas.github.io/unvinito-noticias/"
+SITIO_WEB = "https://noticias.unvinito.cl"
 
 # 40 categorías para ¿Lo sabías?
 CATEGORIAS_LO_SABIAS = [
