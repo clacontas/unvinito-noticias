@@ -18,10 +18,10 @@ jobs:
         with:
           python-version: '3.11'
       - name: Instalar dependencias
-        run: pip install groq feedparser tweepy requests
+        run: pip install google-generativeai feedparser tweepy requests
       - name: Publicar noticias
         env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
