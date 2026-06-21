@@ -213,8 +213,7 @@ def guardar_para_web(data):
 
 def publicar_en_x(data):
     try:
-        tweet = f"{data['tweet']}\n\n🔗 {SITIO_WEB}"
-        x_client.create_tweet(text=tweet)
+        x_client.create_tweet(text=data['tweet'])
         print("✅ X publicado")
     except Exception as e:
         print(f"❌ Error X: {e}")
