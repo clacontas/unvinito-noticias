@@ -7,6 +7,8 @@ import json
 import random
 from datetime import datetime
 from groq import Groq
+
+# Configurar Groq
 groq_client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
 # X / Twitter
@@ -25,71 +27,71 @@ SITIO_WEB = "https://clacontas.github.io/unvinito-noticias/"
 # 40 categorías para ¿Lo sabías?
 CATEGORIAS_LO_SABIAS = [
     "historia del vino chileno",
-    "cómo se hace el vino",
+    "como se hace el vino",
     "curiosidades del mundo del vino",
-    "estadísticas sorprendentes del vino",
+    "estadisticas sorprendentes del vino",
     "mitos y verdades sobre el vino",
-    "cómo catar un vino de forma simple",
-    "cómo beberlo y servirlo mejor",
+    "como catar un vino de forma simple",
+    "como beberlo y servirlo mejor",
     "diferencias entre tipos de vino",
     "diferencias entre variedades de uva",
-    "maridajes simples para el día a día",
-    "qué comer con vino tinto chileno",
-    "qué comer con Carménère",
-    "qué comer con Cabernet Sauvignon",
+    "maridajes simples para el dia a dia",
+    "que comer con vino tinto chileno",
+    "que comer con Carmenere",
+    "que comer con Cabernet Sauvignon",
     "maridajes inesperados que funcionan",
-    "valles vitivinícolas de Chile",
-    "el Valle de Colchagua y sus características",
-    "por qué Chile produce vinos únicos",
+    "valles vitivinicolas de Chile",
+    "el Valle de Colchagua y sus caracteristicas",
+    "por que Chile produce vinos unicos",
     "exportaciones de vino chileno al mundo",
     "el vino en la cultura popular",
-    "el vino en el cine y la música",
-    "historia de variedades emblemáticas",
-    "el Carménère y su historia en Chile",
+    "el vino en el cine y la musica",
+    "historia de variedades emblematicas",
+    "el Carmenere y su historia en Chile",
     "el vino en momentos cotidianos",
     "el vino y las estaciones del año",
     "el vino y el clima de Chile",
     "tendencias del vino en el mundo",
-    "vino natural y orgánico en Chile",
-    "el vino sin alcohol y por qué existe",
+    "vino natural y organico en Chile",
+    "el vino sin alcohol y por que existe",
     "el auge del enoturismo en Chile",
-    "por qué el vino une a la gente",
-    "el vino como regalo — qué considerar",
-    "cómo hablar de vino sin saber mucho",
-    "qué preguntar en una vinoteca",
-    "por qué algunos vinos cuestan más",
-    "cómo encontrar buenos vinos baratos",
-    "qué significa relación precio-calidad en vino",
-    "qué es un vino de autor y por qué importa",
-    "la diferencia entre viña grande y pequeña",
-    "por qué los vinos de autor son limitados",
-    "el vino y la gastronomía chilena",
+    "por que el vino une a la gente",
+    "el vino como regalo que considerar",
+    "como hablar de vino sin saber mucho",
+    "que preguntar en una vinoteca",
+    "por que algunos vinos cuestan mas",
+    "como encontrar buenos vinos baratos",
+    "que significa relacion precio calidad en vino",
+    "que es un vino de autor y por que importa",
+    "la diferencia entre vina grande y pequeña",
+    "por que los vinos de autor son limitados",
+    "el vino y la gastronomia chilena",
 ]
 
 # Identidad por día
 IDENTIDAD_DIA = {
-    0: "Arrancar la semana sabiendo más",
-    1: "La sorpresa corta del día",
+    0: "Arrancar la semana sabiendo mas",
+    1: "La sorpresa corta del dia",
     2: "A mitad de semana se antoja esto",
     3: "Dato para el fin de semana que se viene",
     4: "Y si abrimos un vinito esta noche...",
     5: "Sin plan, sin apuro, con copa en mano",
-    6: "Toda gran historia comienza así",
+    6: "Toda gran historia comienza asi",
 }
 
 NOMBRES_DIA = {
-    0: "Lunes", 1: "Martes", 2: "Miércoles",
-    3: "Jueves", 4: "Viernes", 5: "Sábado", 6: "Domingo"
+    0: "Lunes", 1: "Martes", 2: "Miercoles",
+    3: "Jueves", 4: "Viernes", 5: "Sabado", 6: "Domingo"
 }
 
 CIERRES = [
-    "Se antoja otro, ¿no? 🍷",
-    "Así empiezan las mejores historias. 🍷",
-    "Sin razón. Sin apuro. 🍷",
+    "Se antoja otro, no? 🍷",
+    "Asi empiezan las mejores historias. 🍷",
+    "Sin razon. Sin apuro. 🍷",
     "Toda gran historia comienza con un vinito. 🍷",
-    "Se me antojó contártelo. 🍷",
+    "Se me antojo contartelo. 🍷",
     "Y si abrimos uno ahora. 🍷",
-    "Hay más donde esto salió. 🍷",
+    "Hay mas donde esto salio. 🍷",
 ]
 
 RSS_FEEDS = [
@@ -125,57 +127,49 @@ def generar_contenido(noticias):
     identidad = IDENTIDAD_DIA[dia_semana]
     categoria = obtener_categoria_del_dia()
     cierre = obtener_cierre()
-    es_especial = dia_semana in [4, 6]  # Viernes o domingo
-    titulares = "\n".join([f"{i+1}. {n['titulo']} ({n['fuente']})" 
+    es_especial = dia_semana in [4, 6]
+    titulares = "\n".join([f"{i+1}. {n['titulo']} ({n['fuente']})"
                            for i, n in enumerate(noticias)])
 
-    prompt = f"""Eres la voz de UNVINITO — vino chileno del Valle de Colchagua.
+    prompt = f"""Eres la voz de UNVINITO, vino chileno del Valle de Colchagua.
 
 ESENCIA DE LA MARCA:
-UNVINITO es espontáneo. No necesita ocasión especial.
-Es el "se me antoja un vinito", el "y si abrimos un vinito", el "me tomaría un vinito".
+UNVINITO es espontaneo. No necesita ocasion especial.
+Es el "se me antoja un vinito", el "y si abrimos un vinito", el "me tomaria un vinito".
 Tagline: "Toda gran historia comienza con UNVINITO."
 
 VOZ:
-- Amigo con muy buen gusto que te manda un mensaje sin formalidad
-- Cercano, espontáneo, con humor suave
-- Nunca pretencioso, nunca técnico
-- JAMÁS uses: maridaje formal, bouquet, notas organolépticas, sumiller
-- SÍ puedes decir: "se antoja", "pide", "va perfecto con", "sin apuro"
+- Amigo con muy buen gusto que manda un mensaje sin formalidad
+- Cercano, espontaneo, con humor suave
+- JAMAS uses: maridaje formal, bouquet, notas organolepticas, sumiller
+- SI puedes decir: "se antoja", "pide", "va perfecto con", "sin apuro"
 
 HOY: {nombre_dia} {hoy.strftime('%d de %B de %Y')}
-IDENTIDAD DEL DÍA: {identidad}
+IDENTIDAD DEL DIA: {identidad}
 
 NOTICIAS DISPONIBLES:
 {titulares}
 
-CATEGORÍA ¿LO SABÍAS? HOY: {categoria}
+CATEGORIA LO SABIAS HOY: {categoria}
 
 REGLAS ABSOLUTAS:
 - NUNCA inventes datos, fechas o cifras
-- Solo usa información que puedas verificar
-- Máximo 3 líneas por sección
-- El tono debe sentirse como un WhatsApp de alguien con buen gusto
+- Solo usa informacion verificable de las noticias
+- Maximo 3 lineas por seccion
+- Tono como WhatsApp de alguien con buen gusto
 
-Genera SOLO este JSON sin backticks ni texto extra:
-{{
-  "noticia_titulo": "titular de la noticia más interesante para el consumidor de UNVINITO",
-  "noticia_opinion": "2-3 líneas con opinión espontánea y cercana de UNVINITO sobre esta noticia",
-  "noticia_fuente": "nombre del medio",
-  "noticia_url_index": 0,
-  "lo_sabias": "dato fascinante sobre '{categoria}' en 2-3 líneas, cercano, sin tecnicismos, que el lector repita en una conversación esta noche",
-  "momento": "{'escena concreta para vivir con UNVINITO esta noche — música real o película real con contexto de por qué hoy, sin inventar datos' if es_especial else ''}",
-  "tweet": "versión para X max 220 chars con personalidad UNVINITO, espontánea, con #VinoChileno #UNVINITO"
-}}"""
+Responde SOLO con este JSON sin backticks ni texto extra:
+{{"noticia_titulo": "titular mas interesante para consumidor UNVINITO", "noticia_opinion": "2-3 lineas opinion espontanea UNVINITO", "noticia_fuente": "nombre del medio", "noticia_url_index": 0, "lo_sabias": "dato fascinante sobre {categoria} en 2-3 lineas cercanas sin tecnicismos que el lector repita esta noche", "momento": "{'escena concreta para vivir con UNVINITO esta noche sin inventar datos' if es_especial else ''}", "tweet": "version para X max 220 chars con personalidad UNVINITO y #VinoChileno #UNVINITO"}}"""
 
     respuesta = groq_client.chat.completions.create(
-    model="llama-3.3-70b-versatile",
-    messages=[{"role": "user", "content": prompt}],
-    temperature=0.7,
-    max_tokens=1000
-)
-texto = respuesta.choices[0].message.content.strip()
-    print(f"Gemini: {texto[:300]}")
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7,
+        max_tokens=1000
+    )
+
+    texto = respuesta.choices[0].message.content.strip()
+    print(f"Groq: {texto[:300]}")
     texto = texto.replace("```json", "").replace("```", "").strip()
 
     try:
@@ -235,7 +229,7 @@ def publicar_en_telegram(data):
         msg += f"{data['noticia_opinion']}\n"
         msg += f"📰 {data['noticia_fuente']}\n\n"
         msg += f"──────────────\n"
-        msg += f"¿LO SABÍAS?\n"
+        msg += f"LO SABIAS?\n"
         msg += f"──────────────\n"
         msg += f"{data['lo_sabias']}\n\n"
 
