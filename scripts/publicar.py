@@ -6,11 +6,8 @@ import requests
 import json
 import random
 from datetime import datetime
-import google.generativeai as genai
-
-# Configurar Gemini
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-2.0-flash")
+from groq import Groq
+groq_client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
 # X / Twitter
 x_client = tweepy.Client(
@@ -171,8 +168,13 @@ Genera SOLO este JSON sin backticks ni texto extra:
   "tweet": "versión para X max 220 chars con personalidad UNVINITO, espontánea, con #VinoChileno #UNVINITO"
 }}"""
 
-    respuesta = model.generate_content(prompt)
-    texto = respuesta.text.strip()
+    respuesta = groq_client.chat.completions.create(
+    model="llama-3.3-70b-versatile",
+    messages=[{"role": "user", "content": prompt}],
+    temperature=0.7,
+    max_tokens=1000
+)
+texto = respuesta.choices[0].message.content.strip()
     print(f"Gemini: {texto[:300]}")
     texto = texto.replace("```json", "").replace("```", "").strip()
 
