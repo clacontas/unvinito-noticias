@@ -194,8 +194,9 @@ Responde SOLO con este JSON sin backticks ni texto extra:
     return data
 
 def guardar_para_web(data):
+    hoy = datetime.now().strftime("%Y-%m-%d")
     web_data = {
-        "fecha": datetime.now().strftime("%Y-%m-%d"),
+        "fecha": hoy,
         "fecha_legible": f"{data['nombre_dia']} {data['fecha']}",
         "identidad": IDENTIDAD_DIA[datetime.now().weekday()],
         "noticias": [{
@@ -210,9 +211,13 @@ def guardar_para_web(data):
         "cierre": data["cierre"]
     }
     os.makedirs("docs/data", exist_ok=True)
+    # Guardar como contenido de hoy
     with open("docs/data/noticias.json", "w", encoding="utf-8") as f:
         json.dump(web_data, f, ensure_ascii=False, indent=2)
-    print("✅ Web actualizada")
+    # Guardar histórico por fecha
+    with open(f"docs/data/{hoy}.json", "w", encoding="utf-8") as f:
+        json.dump(web_data, f, ensure_ascii=False, indent=2)
+    print(f"✅ Web actualizada y guardado histórico {hoy}")
 
 def publicar_en_x(data):
     try:
