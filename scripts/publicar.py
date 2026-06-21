@@ -160,9 +160,12 @@ REGLAS ABSOLUTAS — VIOLACION GRAVE SI NO SE CUMPLEN:
 4. El campo "noticia_url_index" debe ser el numero exacto que aparece en URL_INDEX
 5. Maximo 3 lineas por seccion
 6. Tono como WhatsApp de alguien con buen gusto
+7. En LO SABIAS evita datos obvios como "el vino tinto va con carnes". Busca el angulo inesperado que sorprenda
+8. En EL MOMENTO usa el contexto real del dia para crear la escena — no algo generico que funcione cualquier dia
 
 Responde SOLO con este JSON sin backticks ni texto extra:
-{{"noticia_titulo": "COPIA EXACTA del titular original sin modificar", "noticia_opinion": "2-3 lineas opinion espontanea UNVINITO sobre esta noticia", "noticia_fuente": "nombre exacto del medio", "noticia_url_index": 0, "lo_sabias": "dato fascinante sobre {categoria} en 2-3 lineas cercanas sin tecnicismos que el lector repita esta noche", "momento": "{'escena concreta para vivir con UNVINITO esta noche, con musica o pelicula real, sin inventar datos' if es_especial else ''}", "tweet": "opinion espontanea UNVINITO sobre la noticia max 220 chars con #VinoChileno #UNVINITO sin incluir el titular exacto"}}"""
+{{"noticia_titulo": "COPIA EXACTA del titular original sin modificar", "noticia_opinion": "2-3 lineas opinion espontanea UNVINITO sobre esta noticia", "noticia_fuente": "nombre exacto del medio", "noticia_url_index": 0, "lo_sabias": "dato sobre {categoria} que el 90% de la gente NO sabe. Debe sorprender. Evita lo obvio. Termina con una consecuencia practica para el lector esta noche. 2-3 lineas maximo, sin tecnicismos, que el lector pueda repetir en una conversacion y quedar bien",
+"momento": "{'escena concreta y especifica para vivir con UNVINITO esta noche. Usa el contexto real del dia ' + nombre_dia + ' ' + hoy.strftime('%d de %B') + '. Conecta un momento cultural real (musica, pelicula, lugar) con por que encaja exactamente hoy — no cualquier dia. Sin inventar datos. Con emocion real.' if es_especial else ''}", "tweet": "opinion espontanea UNVINITO sobre la noticia max 220 chars con #VinoChileno #UNVINITO sin incluir el titular exacto"}}"""
 
     respuesta = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
