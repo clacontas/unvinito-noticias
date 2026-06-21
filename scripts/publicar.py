@@ -4,7 +4,6 @@ import feedparser
 import tweepy
 import requests
 import json
-import random
 from datetime import datetime
 from groq import Groq
 
@@ -68,7 +67,6 @@ CATEGORIAS_LO_SABIAS = [
     "el vino y la gastronomia chilena",
 ]
 
-# Identidad por día
 IDENTIDAD_DIA = {
     0: "Arrancar la semana sabiendo mas",
     1: "La sorpresa corta del dia",
@@ -113,12 +111,12 @@ def obtener_noticias():
     return noticias[:6]
 
 def obtener_categoria_del_dia():
-    dia_del_año = datetime.now().timetuple().tm_yday
-    return CATEGORIAS_LO_SABIAS[dia_del_año % len(CATEGORIAS_LO_SABIAS)]
+    dia_del_anio = datetime.now().timetuple().tm_yday
+    return CATEGORIAS_LO_SABIAS[dia_del_anio % len(CATEGORIAS_LO_SABIAS)]
 
 def obtener_cierre():
-    dia_del_año = datetime.now().timetuple().tm_yday
-    return CIERRES[dia_del_año % len(CIERRES)]
+    dia_del_anio = datetime.now().timetuple().tm_yday
+    return CIERRES[dia_del_anio % len(CIERRES)]
 
 def generar_contenido(noticias):
     hoy = datetime.now()
@@ -128,8 +126,11 @@ def generar_contenido(noticias):
     categoria = obtener_categoria_del_dia()
     cierre = obtener_cierre()
     es_especial = dia_semana in [4, 6]
-    titulares = "\n".join([f"{i+1}. {n['titulo']} ({n['fuente']})"
-                           for i, n in enumerate(noticias)])
+
+    titulares = "\n".join([
+        f"{i+1}. TITULAR: {n['titulo']} | FUENTE: {n['fuente']} | URL_INDEX: {i}"
+        for i, n in enumerate(noticias)
+    ])
 
     prompt = f"""Eres la voz de UNVINITO, vino chileno del Valle de Colchagua.
 
@@ -147,19 +148,21 @@ VOZ:
 HOY: {nombre_dia} {hoy.strftime('%d de %B de %Y')}
 IDENTIDAD DEL DIA: {identidad}
 
-NOTICIAS DISPONIBLES:
+NOTICIAS DISPONIBLES (elige la mas relevante para el consumidor de UNVINITO):
 {titulares}
 
 CATEGORIA LO SABIAS HOY: {categoria}
 
-REGLAS ABSOLUTAS:
-- NUNCA inventes datos, fechas o cifras
-- Solo usa informacion verificable de las noticias
-- Maximo 3 lineas por seccion
-- Tono como WhatsApp de alguien con buen gusto
+REGLAS ABSOLUTAS — VIOLACION GRAVE SI NO SE CUMPLEN:
+1. El campo "noticia_titulo" debe ser COPIA EXACTA del titular original, sin cambiar ni una palabra
+2. NUNCA reescribas, mejores ni inventes un titular propio
+3. NUNCA inventes datos, fechas o cifras que no esten en las noticias
+4. El campo "noticia_url_index" debe ser el numero exacto que aparece en URL_INDEX
+5. Maximo 3 lineas por seccion
+6. Tono como WhatsApp de alguien con buen gusto
 
 Responde SOLO con este JSON sin backticks ni texto extra:
-{{"noticia_titulo": "titular mas interesante para consumidor UNVINITO", "noticia_opinion": "2-3 lineas opinion espontanea UNVINITO", "noticia_fuente": "nombre del medio", "noticia_url_index": 0, "lo_sabias": "dato fascinante sobre {categoria} en 2-3 lineas cercanas sin tecnicismos que el lector repita esta noche", "momento": "{'escena concreta para vivir con UNVINITO esta noche sin inventar datos' if es_especial else ''}", "tweet": "version para X max 220 chars con personalidad UNVINITO y #VinoChileno #UNVINITO"}}"""
+{{"noticia_titulo": "COPIA EXACTA del titular original sin modificar", "noticia_opinion": "2-3 lineas opinion espontanea UNVINITO sobre esta noticia", "noticia_fuente": "nombre exacto del medio", "noticia_url_index": 0, "lo_sabias": "dato fascinante sobre {categoria} en 2-3 lineas cercanas sin tecnicismos que el lector repita esta noche", "momento": "{'escena concreta para vivir con UNVINITO esta noche, con musica o pelicula real, sin inventar datos' if es_especial else ''}", "tweet": "opinion espontanea UNVINITO sobre la noticia max 220 chars con #VinoChileno #UNVINITO sin incluir el titular exacto"}}"""
 
     respuesta = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
